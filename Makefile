@@ -15,4 +15,4 @@ send-email:
 	oc create -f $(BASE)/send-email.yaml
 
 clean-jobs:
-	oc delete all -l app=send-email
+	-oc delete all -l app=send-email
