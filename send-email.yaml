@@ -12,18 +12,32 @@ spec:
     spec:
       containers:
       # Code copied from https://docs.python.org/3/library/smtplib.html
-      - command:
+      - env:
+        - name: FROM
+          value: "user1@example.com"
+        - name: TO
+          value: "user2@example.com"
+        - name: SUBJECT
+          value: "Test Message"
+        - name: BODY
+          value: "Hello, this is a test"
+        - name: SMTPSERVER
+          value: "maildev-smtp"
+        command:
         - /bin/bash
         - -c
         - |
           cat <<EOF | python3
+          import os
           import smtplib
 
-          fromaddr="user1@example.com"
-          toaddr="user2@example.com"
-          smtpserver = "maildev-smtp"
+          fromaddr=os.getenv('FROM')
+          toaddr=os.getenv('TO')
+          subject=os.getenv('SUBJECT')
+          body=os.getenv('BODY')
+          smtpserver = os.getenv('SMTPSERVER')
 
-          msg = ("From: %s\r\nTo: %s\r\nSubject: Test Message\r\n\r\nHello, this is a test\r\n" % (fromaddr, toaddr))
+          msg = ("From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n%s\r\n" % (fromaddr, toaddr, subject, body))
           server = smtplib.SMTP(smtpserver)
           server.set_debuglevel(1)
           server.sendmail(fromaddr, toaddr, msg)
